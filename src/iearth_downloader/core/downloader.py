@@ -4,19 +4,20 @@ Download module for handling file downloads and logging.
 
 import os
 import requests
-import threading # For type hinting Optional[threading.Lock]
+import threading  # For type hinting Optional[threading.Lock]
 from typing import Dict, Any, Optional
-from utils.encrypt_utils import encrypt4long
+from iearth_downloader.utils.encrypt_utils import encrypt4long
 
 # Import constants from config that are NOT user credentials
-from config.config import RESOURCE_ID
-    # TOKEN and USER_ACCOUNT are no longer imported directly from config
-    # FINISHED_LOG_FILE is also not needed here anymore as Logger gets its path from download_processor
+from iearth_downloader.config.config import RESOURCE_ID
 
-from system.const import sys_config # Import sys_config
+# TOKEN and USER_ACCOUNT are no longer imported directly from config
+# FINISHED_LOG_FILE is also not needed here anymore as Logger gets its path from download_processor
+
+from iearth_downloader.system.const import sys_config  # Import sys_config
 
 # Import the auth module to access its getter functions for credentials
-import utils.auth as auth
+import iearth_downloader.utils.auth as auth
 
 
 class Downloader:
@@ -25,7 +26,7 @@ class Downloader:
     def __init__(self, resource_id: int = None):
         """
         Initialize the Downloader.
-        
+
         Args:
             resource_id: Optional resource ID to use. If None, uses the default from config.
         """
@@ -50,19 +51,19 @@ class Downloader:
 
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {current_token}"  # Use the retrieved token
+                "Authorization": f"Bearer {current_token}",  # Use the retrieved token
             }
-            
+
             # The print for starting download is now in download_processor's worker thread
             # response = requests.post(DOWNLOAD_API, json=payload, headers=headers, stream=True)
             response = requests.post(sys_config.download_api, json=payload, stream=True)
             response.raise_for_status()
 
-            with open(local_file_path, 'wb') as f:
+            with open(local_file_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=sys_config.chunk_size):
                     if chunk:
                         f.write(chunk)
-            
+
             # The print for successful download is now in download_processor's worker thread
             print(f"Successfully downloaded: {local_file_path}")
             return True
@@ -93,7 +94,7 @@ class Downloader:
             "country": "China",
             "file_size": size,
             "file_name": filename,
-            "resource_type": "REMOTE_SENSING"
+            "resource_type": "REMOTE_SENSING",
         }
 
         try:
@@ -114,19 +115,19 @@ class Logger:
     def __init__(self, log_file: str, lock: Optional[threading.Lock] = None) -> None:
         """Initialize the logger with a log file and an optional lock."""
         self.log_file = log_file
-        self.lock: Optional[threading.Lock] = lock # Type hint for instance variable
+        self.lock: Optional[threading.Lock] = lock  # Type hint for instance variable
 
     def initialize_fullpath_log(self) -> None:
         """Initialize or clear the log file."""
         try:
             if self.lock:
                 self.lock.acquire()
-            with open(self.log_file, 'w', encoding='utf-8') as f:
+            with open(self.log_file, "w", encoding="utf-8") as f:
                 f.write("")
             # Initialization print is now handled by download_processor
         except Exception:
             # Errors (including print statements) are now handled by the calling download_processor
-            pass # Let the caller handle logging of this error
+            pass  # Let the caller handle logging of this error
         finally:
             if self.lock and self.lock.locked():
                 self.lock.release()
@@ -137,7 +138,7 @@ class Logger:
         Removes the first two directory levels from the path.
         """
         try:
-            path_parts = fullpath.split('/')
+            path_parts = fullpath.split("/")
             if len(path_parts) > 2:
                 modified_fullpath = "/".join(path_parts[2:])
             else:
@@ -145,11 +146,11 @@ class Logger:
 
             if self.lock:
                 self.lock.acquire()
-            with open(self.log_file, 'a', encoding='utf-8') as f:
+            with open(self.log_file, "a", encoding="utf-8") as f:
                 f.write(f"{modified_fullpath}\n")
         except Exception:
             # Errors (including print statements) are now handled by the calling download_processor
-            pass # Let the caller handle logging of this error
+            pass  # Let the caller handle logging of this error
         finally:
             if self.lock and self.lock.locked():
                 self.lock.release()

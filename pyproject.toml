@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iearth-downloader"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["pycryptodome>=3.23.0", "requests>=2.32.5", "typer>=0.20.0"]
+
+[project.scripts]
+iearth = "iearth_downloader.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
