@@ -122,10 +122,11 @@ class DownloadProcessor:
                         self.downloaded_files_count
                     )
 
-                if not self.downloader.record_download_info(fullpath, filename, size):
-                    print(
-                        f"Thread {current_thread_id}: Failed to record download information for: {filename}"
-                    )
+                # the following api is abandoned for now
+                # if not self.downloader.record_download_info(fullpath, filename, size):
+                #     print(
+                #         f"Thread {current_thread_id}: Failed to record download information for: {filename}"
+                #     )
 
                 if (
                     current_total_downloaded_by_all_threads % self.sleep_after_files

@@ -46,6 +46,13 @@ class Downloader:
         try:
             os.makedirs(local_path, exist_ok=True)
             local_file_path = os.path.join(local_path, filename)
+            if (
+                os.path.exists(local_file_path)
+                and os.path.getsize(local_file_path) > 0.01
+            ):
+                print(f"File already exists and is non-empty: {local_file_path}")
+                return True
+
             encrypt_fullpath = encrypt4long({"objectKey": fullpath})
             payload = {
                 "objectKey": fullpath,
