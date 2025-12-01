@@ -7,16 +7,16 @@ import time
 import threading
 import queue
 
-from .catalog_manager import CatalogManager
-from .file_manager import FileManager
-from .downloader import Downloader, Logger
+from iearth_downloader.core.catalog_manager import CatalogManager
+from iearth_downloader.core.file_manager import FileManager
+from iearth_downloader.core.downloader import Downloader, Logger
 from iearth_downloader.config.config import (
     DEFAULT_DOWNLOAD_PATH,
     MAX_DOWNLOAD_THREADS,
     TARGET_SUB_PATH,
     RESOURCE_ID,
 )
-from iearth_downloader.system.const import get_system_config
+from ..system.const import get_system_config
 
 
 def get_download_path():

@@ -6,3 +6,5 @@ build/
 credential.toml
 *.json
 *.txt
+*.ipynb
+*.tif

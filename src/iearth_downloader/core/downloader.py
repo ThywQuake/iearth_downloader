@@ -17,7 +17,7 @@ from iearth_downloader.config.config import RESOURCE_ID
 from iearth_downloader.system.const import sys_config  # Import sys_config
 
 # Import the auth module to access its getter functions for credentials
-import iearth_downloader.utils.auth as auth
+from iearth_downloader.utils import auth
 
 
 class Downloader:
@@ -56,11 +56,14 @@ class Downloader:
 
             # The print for starting download is now in download_processor's worker thread
             # response = requests.post(DOWNLOAD_API, json=payload, headers=headers, stream=True)
-            response = requests.post(sys_config.download_api, json=payload, stream=True)
-            response.raise_for_status()
+            response = requests.post(
+                sys_config.download_api, json=payload, headers=headers
+            )
+            signed_url = response.json().get("signedUrl")
 
             with open(local_file_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=sys_config.chunk_size):
+                r = requests.get(signed_url, stream=True)
+                for chunk in r.iter_content(chunk_size=sys_config.chunk_size):
                     if chunk:
                         f.write(chunk)
 

@@ -6,8 +6,8 @@ import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from iearth_downloader.core.download_processor import DownloadProcessor
-    from iearth_downloader.utils import auth
+    from .core.download_processor import DownloadProcessor
+    from .utils import auth
 
 app = typer.Typer(help="iEarth Data Download CLI")
 
@@ -120,7 +120,9 @@ def download(
     typer.echo("\nAuthentication successful！")
 
     confirmation = (
-        typer.prompt("Whether to start downloading task immediately？([y]/n): ")
+        typer.prompt(
+            "Whether to start downloading task immediately？([y]/n): ", default="y"
+        )
         .strip()
         .lower()
     )
@@ -150,4 +152,5 @@ def download(
 
 
 if __name__ == "__main__":
-    app()
+    # app()  # pragma: no cover
+    download(resource_id=60)

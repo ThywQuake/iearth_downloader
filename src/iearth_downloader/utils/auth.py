@@ -1,7 +1,7 @@
 import requests
 import json
 import getpass
-from .encrypt_utils import encrypt_auth
+from iearth_downloader.utils.encrypt_utils import encrypt_auth
 import os
 from iearth_downloader.system.const import sys_config
 
