@@ -47,7 +47,13 @@ class Downloader:
             os.makedirs(local_path, exist_ok=True)
             local_file_path = os.path.join(local_path, filename)
             encrypt_fullpath = encrypt4long({"objectKey": fullpath})
-            payload = {"key": encrypt_fullpath}
+            payload = {
+                "objectKey": fullpath,
+                "resourceId": str(self.resource_id),
+                "userAccount": auth.get_user_account(),  # Get user_account from auth module
+                "resourceType": "REMOTE_SENSING",
+                "country": "Japan",
+            }
 
             headers = {
                 "Content-Type": "application/json",
@@ -55,11 +61,16 @@ class Downloader:
             }
 
             # The print for starting download is now in download_processor's worker thread
-            # response = requests.post(DOWNLOAD_API, json=payload, headers=headers, stream=True)
+            # New api call to get signed URL
             response = requests.post(
                 sys_config.download_api, json=payload, headers=headers
             )
-            signed_url = response.json().get("signedUrl")
+            signed_url = response.json()["signedUrl"]
+            site = signed_url.split("/")[2].split(":")[0]
+            params = signed_url.split("?")[1]
+            signed_url = f"https://{site}/{fullpath}?{params}"
+            # Decode the url from url encoding
+            signed_url = requests.utils.unquote(signed_url)
 
             with open(local_file_path, "wb") as f:
                 r = requests.get(signed_url, stream=True)
