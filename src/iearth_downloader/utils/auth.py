@@ -11,8 +11,31 @@ authenticated_user_info = {"username": None, "user_account": None, "token": None
 
 def get_credentials():
     """Prompts the user for account and password."""
-    account = input("Please input your account: ")
-    password = getpass.getpass("Please input your password: ")
+    if os.path.exists("credential.toml"):
+        try:
+            import toml
+
+            creds = toml.load("credential.toml")
+            account = creds.get("account", "")
+            password = creds.get("password", "")
+            if account and password:
+                print("Using credentials from credential.toml")
+                return account, password
+        except Exception as e:
+            print(f"Error reading credential.toml: {e}")
+    else:
+        print("credential.toml not found, please enter your credentials.")
+        account = input("Please input your account: ")
+        password = getpass.getpass("Please input your password: ")
+        with open("credential.toml", "w", encoding="utf-8") as f:
+            try:
+                import toml
+
+                toml.dump({"account": account, "password": password}, f)
+                print("Credentials saved to credential.toml for future use.")
+            except Exception as e:
+                print(f"Error saving credentials to credential.toml: {e}")
+
     return account, password
 
 

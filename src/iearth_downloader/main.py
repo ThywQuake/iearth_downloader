@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 import sys
+import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -41,9 +42,9 @@ def download(
 
     # User authentication
     typer.echo("=== User authentication ===")
-    if not auth.login():
+    while not auth.login():
         typer.echo("Authentication failed, unable to continue downloading task")
-        sys.exit(1)
+        os.remove("credential.toml")
 
     typer.echo("\nAuthentication successful！")
 
