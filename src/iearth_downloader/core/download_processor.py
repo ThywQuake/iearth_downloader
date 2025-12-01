@@ -16,7 +16,7 @@ from iearth_downloader.config.config import (
     TARGET_SUB_PATH,
     RESOURCE_ID,
 )
-from ..system.const import get_system_config
+from iearth_downloader.system.const import get_system_config
 
 
 def get_download_path():
