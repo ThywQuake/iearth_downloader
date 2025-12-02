@@ -6,7 +6,15 @@ import os
 from iearth_downloader.system.const import sys_config
 
 # Session state for authenticated user - to be populated after successful login
-authenticated_user_info = json.loads(open("auth.json"))
+authenticated_user_info = (
+    json.load(open("auth.json"))
+    if os.path.exists("auth.json")
+    else {
+        "username": None,
+        "user_account": None,
+        "token": None,
+    }
+)
 
 
 def get_credentials():
@@ -106,17 +114,17 @@ def login() -> bool:
 
 # Getter functions for other modules to access authenticated user info
 def get_username() -> str | None:
-    authenticated_user_info = json.loads(open("auth.json").read())
+    authenticated_user_info = json.load(open("auth.json"))
     return authenticated_user_info["username"]
 
 
 def get_user_account() -> str | None:
-    authenticated_user_info = json.loads(open("auth.json").read())
+    authenticated_user_info = json.load(open("auth.json"))
     return authenticated_user_info["user_account"]
 
 
 def get_token() -> str | None:
-    authenticated_user_info = json.loads(open("auth.json").read())
+    authenticated_user_info = json.load(open("auth.json"))
     return authenticated_user_info["token"]
 
 
