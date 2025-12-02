@@ -102,6 +102,10 @@ class DownloadProcessor:
 
     def _download_worker(self):
         """Worker function for download threads."""
+
+        continuous_failure_count = 0
+        max_continuous_failures = 5  # Threshold to trigger re-login
+
         while True:
             task = self.download_queue.get()
 
@@ -137,10 +141,21 @@ class DownloadProcessor:
                         f"Thread {current_thread_id}: Pausing for {self.sleep_interval} second(s) after {current_total_downloaded_by_all_threads} total downloads by the process..."
                     )
                     time.sleep(self.sleep_interval)
-            else:
-                print(f"Thread {current_thread_id}: Failed to download: {filename}")
 
-            self.download_queue.task_done()
+                continuous_failure_count = 0  # Reset on success
+                self.download_queue.task_done()
+            else:
+                continuous_failure_count += 1
+                if continuous_failure_count >= max_continuous_failures:
+                    self.download_queue.task_done()
+                print(f"Thread {current_thread_id}: Failed to download: {filename}")
+                print(
+                    f"Thread {current_thread_id}: Re-logining and retrieving new token..."
+                )
+
+                from iearth_downloader.utils import auth
+
+                auth.login()
 
     def process_catalog_and_download(self) -> None:
         """

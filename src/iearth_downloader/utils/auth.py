@@ -6,7 +6,7 @@ import os
 from iearth_downloader.system.const import sys_config
 
 # Session state for authenticated user - to be populated after successful login
-authenticated_user_info = {"username": None, "user_account": None, "token": None}
+authenticated_user_info = json.loads(open("auth.json"))
 
 
 def get_credentials():
@@ -74,6 +74,8 @@ def login() -> bool:
             authenticated_user_info["user_account"] = user_data.get("email")
             authenticated_user_info["token"] = user_data.get("token")
 
+            json.dump(authenticated_user_info, open("auth.json", "w"), indent=4)
+
             print(f"Username: {authenticated_user_info['username']}")
             print(f"Email: {authenticated_user_info['user_account']}")
             return True
@@ -83,6 +85,7 @@ def login() -> bool:
             authenticated_user_info.update(
                 {"username": None, "user_account": None, "token": None}
             )
+            json.dump(authenticated_user_info, open("auth.json", "w"), indent=4)
             return False
 
     except requests.exceptions.RequestException as e:
@@ -90,25 +93,30 @@ def login() -> bool:
         authenticated_user_info.update(
             {"username": None, "user_account": None, "token": None}
         )
+        json.dump(authenticated_user_info, open("auth.json", "w"), indent=4)
         return False
     except json.JSONDecodeError:
         print("Failed to parse login response.")
         authenticated_user_info.update(
             {"username": None, "user_account": None, "token": None}
         )
+        json.dump(authenticated_user_info, open("auth.json", "w"), indent=4)
         return False
 
 
 # Getter functions for other modules to access authenticated user info
 def get_username() -> str | None:
+    authenticated_user_info = json.loads(open("auth.json").read())
     return authenticated_user_info["username"]
 
 
 def get_user_account() -> str | None:
+    authenticated_user_info = json.loads(open("auth.json").read())
     return authenticated_user_info["user_account"]
 
 
 def get_token() -> str | None:
+    authenticated_user_info = json.loads(open("auth.json").read())
     return authenticated_user_info["token"]
 
 
